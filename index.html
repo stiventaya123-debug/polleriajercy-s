@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pollería Jercy's | El Mejor Pollo a la Brasa</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .hero-overlay { background: rgba(0, 0, 0, 0.45); }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-orange-500 selection:text-white">
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAMAVmKSb8Tygvd3NycZMrBj86GN9h4-j4",
+            authDomain: "registro-personas-c5e48.firebaseapp.com",
+            projectId: "registro-personas-c5e48",
+            storageBucket: "registro-personas-c5e48.firebasestorage.app",
+            messagingSenderId: "129443873783",
+            appId: "1:129443873783:web:9d4575e9ea54ba208e24f2"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.db = db;
+        window.firebaseFns = { collection, addDoc, onSnapshot };
+    </script>
+
+    <!-- Header (Sin acceso de Admin) -->
+    <header class="absolute top-0 left-0 w-full z-50 bg-gradient-to-b from-black/85 via-black/50 to-transparent py-4">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-3 items-center">
+            
+            <!-- Izquierda: INICIO y NUESTRO MENÚ -->
+            <nav class="hidden md:flex items-center space-x-8 text-xs font-black tracking-wider text-white">
+                <a href="#" class="hover:text-orange-400 transition drop-shadow py-2">INICIO</a>
+                <a href="#menu-section" class="hover:text-orange-400 transition drop-shadow py-2">NUESTRO MENÚ</a>
+            </nav>
+
+            <!-- Centro: Logo Absoluto y Centrado -->
+            <div class="flex justify-center col-span-3 md:col-span-1">
+                <div class="relative group">
+                    <img id="header-logo" src="https://images.unsplash.com/photo-1626500147576-4d37c89f5d16?w=400&q=80" alt="Logo" class="w-20 h-20 rounded-full border-4 border-amber-400 object-cover shadow-2xl bg-black transform group-hover:scale-105 transition duration-300">
+                </div>
+            </div>
+
+            <!-- Derecha: GALERÍA y LOCALES (Sin Botón Admin) -->
+            <div class="hidden md:flex items-center justify-end space-x-8 text-xs font-black tracking-wider text-white col-span-1">
+                <a href="#gallery-section" class="hover:text-orange-400 transition drop-shadow py-2">GALERÍA</a>
+                <a href="#location-section" class="hover:text-orange-400 transition drop-shadow py-2">LOCALES</a>
+                <button id="cart-btn" onclick="toggleCart()" class="relative bg-orange-600 hover:bg-orange-700 text-white p-3 rounded-2xl shadow-xl transition flex items-center space-x-2 font-bold text-xs">
+                    <i class="fa-solid fa-bag-shopping text-base"></i>
+                    <span id="cart-count" class="bg-white text-orange-600 text-[10px] px-1.5 py-0.5 rounded-full font-black shadow">0</span>
+                </button>
+            </div>
+
+            <!-- Botón Carrito para Móviles -->
+            <div class="absolute right-4 md:hidden flex items-center space-x-3">
+                <button id="cart-btn-mobile" onclick="toggleCart()" class="relative bg-orange-600 hover:bg-orange-700 text-white p-3 rounded-2xl shadow-xl transition flex items-center space-x-2 font-bold text-xs">
+                    <i class="fa-solid fa-bag-shopping text-base"></i>
+                    <span id="cart-count-mobile" class="bg-white text-orange-600 text-[10px] px-1.5 py-0.5 rounded-full font-black shadow">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Banner Principal -->
+    <div class="relative bg-slate-900 text-white overflow-hidden min-h-[600px] md:min-h-[700px] flex items-center justify-center">
+        <div class="absolute inset-0 z-0">
+            <img id="banner-img" src="https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=2400&q=90" alt="Pollo a la Brasa" class="w-full h-full object-cover object-center filter brightness-90">
+        </div>
+        <div class="hero-overlay absolute inset-0 z-10"></div>
+
+        <div class="relative z-20 max-w-4xl mx-auto px-4 text-center flex flex-col items-center pt-24">
+            <span class="bg-black/60 border border-orange-500/50 text-orange-400 text-xs font-bold px-4 py-1 rounded-md mb-6 uppercase tracking-widest backdrop-blur-sm">
+                BIENVENIDO
+            </span>
+            <h2 class="text-4xl md:text-7xl font-black mb-6 tracking-tight leading-none drop-shadow-2xl text-amber-400 uppercase">
+                ¡UN POLLITO CON MUCHA HISTORIA!
+            </h2>
+            <a href="#menu-section" class="bg-black/70 hover:bg-black border border-slate-600 text-white font-bold px-6 py-2.5 rounded-lg backdrop-blur-md transition text-xs tracking-widest uppercase shadow-xl">
+                – VER NUESTRO MENÚ –
+            </a>
+        </div>
+    </div>
+
+    <!-- Menú Principal -->
+    <main id="menu-section" class="max-w-7xl mx-auto px-4 py-16 flex-1 w-full">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 border-b border-slate-800 pb-6">
+            <div>
+                <h3 class="text-2xl md:text-3xl font-black text-white flex items-center tracking-tight">
+                    <i class="fa-solid fa-drumstick-bite text-orange-500 mr-3 p-2.5 bg-orange-500/10 rounded-2xl border border-orange-500/20 text-xl"></i> 
+                    Nuestra Carta
+                </h3>
+                <p class="text-xs text-slate-400 mt-1">Selecciona tus platos favoritos y arma tu pedido al instante.</p>
+            </div>
+            <div class="w-full md:w-80 relative">
+                <i class="fa-solid fa-search absolute left-4 top-3.5 text-slate-400 text-sm"></i>
+                <input type="text" id="search-input" oninput="filterMenu()" placeholder="Busca tu pollo, combo, bebida..." class="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-800 focus:outline-none focus:border-orange-500 text-sm bg-slate-900 text-white placeholder-slate-500 shadow-inner transition">
+            </div>
+        </div>
+
+        <!-- Categorías -->
+        <div id="category-filters" class="flex overflow-x-auto pb-4 mb-8 space-x-3 scrollbar-none">
+            <button onclick="filterCategory('todos')" class="cat-btn active px-5 py-2.5 rounded-2xl text-xs font-bold bg-orange-600 text-white shadow-lg shadow-orange-600/30 shrink-0 transition flex items-center space-x-2">
+                <i class="fa-solid fa-border-all"></i><span>Todos</span>
+            </button>
+            <button onclick="filterCategory('Pollos')" class="cat-btn px-5 py-2.5 rounded-2xl text-xs font-bold bg-slate-900 text-slate-400 hover:text-white border border-slate-800 shrink-0 transition flex items-center space-x-2">
+                <i class="fa-solid fa-fire text-orange-500"></i><span>Pollos a la Brasa</span>
+            </button>
+            <button onclick="filterCategory('Combos')" class="cat-btn px-5 py-2.5 rounded-2xl text-xs font-bold bg-slate-900 text-slate-400 hover:text-white border border-slate-800 shrink-0 transition flex items-center space-x-2">
+                <i class="fa-solid fa-box-open text-amber-500"></i><span>Combos</span>
+            </button>
+            <button onclick="filterCategory('Bebidas')" class="cat-btn px-5 py-2.5 rounded-2xl text-xs font-bold bg-slate-900 text-slate-400 hover:text-white border border-slate-800 shrink-0 transition flex items-center space-x-2">
+                <i class="fa-solid fa-champagne-glasses text-blue-400"></i><span>Bebidas</span>
+            </button>
+            <button onclick="filterCategory('Adicionales')" class="cat-btn px-5 py-2.5 rounded-2xl text-xs font-bold bg-slate-900 text-slate-400 hover:text-white border border-slate-800 shrink-0 transition flex items-center space-x-2">
+                <i class="fa-solid fa-utensils text-emerald-400"></i><span>Adicionales</span>
+            </button>
+        </div>
+
+        <!-- Grid de Productos -->
+        <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-16"></div>
+
+        <!-- Galería -->
+        <section id="gallery-section" class="mb-16">
+            <div class="border-b border-slate-800 pb-6 mb-8 text-center">
+                <span class="bg-orange-500/10 border border-orange-500/30 text-orange-400 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest inline-block mb-2">
+                    <i class="fa-solid fa-camera mr-1.5 text-orange-500"></i> Espacios y Ambiente
+                </span>
+                <h3 class="text-3xl font-black text-white tracking-tight">Galería de Nuestro Local</h3>
+            </div>
+            <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"></div>
+        </section>
+
+        <!-- Ubicación -->
+        <section id="location-section" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-10 shadow-2xl overflow-hidden relative mb-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center relative z-10">
+                <div class="space-y-6">
+                    <span class="bg-orange-500/10 border border-orange-500/30 text-orange-400 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest inline-block">
+                        <i class="fa-solid fa-map-pin mr-1.5 text-orange-500"></i> Visítanos o Pide Delivery
+                    </span>
+                    <h3 class="text-3xl font-black text-white tracking-tight">¿Dónde Encontrar Pollería Jercy's?</h3>
+                    <div class="space-y-4 pt-2">
+                        <div class="flex items-start space-x-4 bg-slate-950/80 p-4 rounded-2xl border border-slate-800">
+                            <div class="bg-orange-600/20 p-3 rounded-xl text-orange-500 text-lg"><i class="fa-solid fa-location-dot"></i></div>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-400 uppercase">Dirección del Local</h4>
+                                <p id="lbl-address" class="text-sm font-extrabold text-white mt-0.5">Av. Principal 123, Castilla - Piura</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4 bg-slate-950/80 p-4 rounded-2xl border border-slate-800">
+                            <div class="bg-amber-600/20 p-3 rounded-xl text-amber-500 text-lg"><i class="fa-solid fa-clock"></i></div>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-400 uppercase">Horario de Atención</h4>
+                                <p id="lbl-hours" class="text-sm font-extrabold text-white mt-0.5">Lunes a Domingo: 12:00 PM - 11:00 PM</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4 bg-slate-950/80 p-4 rounded-2xl border border-slate-800">
+                            <div class="bg-emerald-600/20 p-3 rounded-xl text-emerald-500 text-lg"><i class="fa-solid fa-phone"></i></div>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-400 uppercase">Teléfono / WhatsApp</h4>
+                                <p id="lbl-phone" class="text-sm font-extrabold text-white mt-0.5">+51 921 932 329</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden h-80 shadow-inner relative">
+                    <iframe id="map-iframe" src="https://maps.google.com/maps?q=Av.%20Principal%20123,%20Castilla%20Piura&t=&z=15&ie=UTF8&iwloc=&output=embed" class="w-full h-full border-0 filter contrast-125 opacity-90 hover:opacity-100 transition" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- WhatsApp Flotante -->
+    <a href="https://wa.me/51921932329" target="_blank" class="fixed bottom-6 left-6 z-50 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-3 rounded-full shadow-2xl flex items-center space-x-2 text-xs font-bold transition transform hover:scale-105">
+        <i class="fa-brands fa-whatsapp text-xl"></i>
+        <span class="hidden sm:inline">¿Necesitas ayuda? Chatea con nosotros</span>
+    </a>
+
+    <!-- Carrito -->
+    <div id="cart-drawer" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden transition-opacity duration-300">
+        <div class="absolute right-0 top-0 h-full w-full max-w-md bg-slate-900 border-l border-slate-800 shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="cart-content-box">
+            <div class="p-5 bg-slate-900 border-b border-slate-800 flex justify-between items-center">
+                <h3 class="font-black text-base text-white flex items-center"><i class="fa-solid fa-basket-shopping text-orange-500 mr-2"></i> Tu Pedido en Jercy's</h3>
+                <button onclick="toggleCart()" class="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 transition"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <div id="cart-items" class="flex-1 overflow-y-auto p-5 space-y-4 divide-y divide-slate-800/60"></div>
+
+            <div class="p-5 bg-slate-950 border-t border-slate-800 space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre y Apellido</label>
+                    <input type="text" id="client-name" placeholder="Ej. Carlos Mendoza" class="w-full p-2.5 rounded-xl border border-slate-800 text-xs bg-slate-900 text-white focus:outline-none focus:border-orange-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Servicio</label>
+                    <select id="delivery-type" onchange="updateCartUI()" class="w-full p-2.5 rounded-xl border border-slate-800 text-xs bg-slate-900 text-white focus:outline-none focus:border-orange-500">
+                        <option value="Delivery Zona Cercana (S/ 5.00)">🛵 Delivery Zona Cercana (+ S/ 5.00)</option>
+                        <option value="Delivery Zona Extensa (S/ 8.00)">🏍️ Delivery Zona Extensa (+ S/ 8.00)</option>
+                        <option value="Recojo en Local (S/ 0.00)">🏬 Recojo en Local (Gratis)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Dirección de Entrega</label>
+                    <input type="text" id="client-address" placeholder="Ej. Av. Principal 456" class="w-full p-2.5 rounded-xl border border-slate-800 text-xs bg-slate-900 text-white focus:outline-none focus:border-orange-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Indicaciones / Referencia para el Repartidor</label>
+                    <input type="text" id="client-notes" placeholder="Ej. Tocar el timbre, casa de portón negro..." class="w-full p-2.5 rounded-xl border border-slate-800 text-xs bg-slate-900 text-white focus:outline-none focus:border-orange-500">
+                </div>
+                <div class="flex justify-between items-center pt-1 font-bold text-sm text-slate-300">
+                    <span>Total con envío:</span>
+                    <span id="cart-total" class="text-orange-500 text-xl font-black">S/ 0.00</span>
+                </div>
+                <button onclick="checkoutWhatsApp()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold py-3 rounded-2xl shadow-lg shadow-emerald-600/30 transition flex items-center justify-center space-x-2 text-xs">
+                    <i class="fa-brands fa-whatsapp text-lg"></i>
+                    <span>Enviar Pedido por WhatsApp</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Cliente -->
+    <script>
+        let cart = [];
+        let products = [];
+        let gallery = [];
+        let currentCategory = 'todos';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const check = setInterval(() => {
+                if (window.db && window.firebaseFns) {
+                    clearInterval(check);
+                    initClient();
+                }
+            }, 200);
+        });
+
+        function initClient() {
+            const { collection, onSnapshot } = window.firebaseFns;
+            const db = window.db;
+
+            onSnapshot(collection(db, "productos"), (snapshot) => {
+                products = [];
+                snapshot.forEach(doc => products.push({ id: doc.id, ...doc.data() }));
+                renderProducts();
+            });
+
+            onSnapshot(collection(db, "galeria"), (snapshot) => {
+                gallery = [];
+                snapshot.forEach(doc => gallery.push({ id: doc.id, ...doc.data() }));
+                renderGallery();
+            });
+
+            onSnapshot(collection(db, "configuracion"), (snapshot) => {
+                snapshot.forEach(doc => {
+                    if (doc.id === "marca") {
+                        const data = doc.data();
+                        if (data.logo) document.getElementById('header-logo').src = data.logo;
+                        if (data.banner) document.getElementById('banner-img').src = data.banner;
+                        if (data.address) {
+                            document.getElementById('lbl-address').textContent = data.address;
+                            document.getElementById('map-iframe').src = `https://maps.google.com/maps?q=${encodeURIComponent(data.address)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+                        }
+                        if (data.hours) document.getElementById('lbl-hours').textContent = data.hours;
+                        if (data.phone) document.getElementById('lbl-phone').textContent = data.phone;
+                    }
+                });
+            });
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('products-grid');
+            const search = document.getElementById('search-input').value.toLowerCase();
+            grid.innerHTML = '';
+
+            const filtered = products.filter(p => {
+                const matchesCat = currentCategory === 'todos' || p.category === currentCategory;
+                const matchesSearch = p.name.toLowerCase().includes(search);
+                return matchesCat && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="col-span-full py-16 text-center text-slate-500"><i class="fa-solid fa-face-sad-tear text-4xl mb-3 text-slate-600"></i><p class="text-sm">No se encontraron productos disponibles.</p></div>';
+                return;
+            }
+
+            filtered.forEach(p => {
+                grid.innerHTML += `
+                    <div class="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-xl flex flex-col group hover:border-orange-500/50 transition duration-300">
+                        <div class="relative overflow-hidden h-48">
+                            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                            <div class="absolute top-3 left-3 bg-slate-950/85 backdrop-blur-md px-3 py-1 rounded-full border border-slate-800">
+                                <span class="text-[10px] font-bold text-orange-400 uppercase tracking-wider">${p.category}</span>
+                            </div>
+                        </div>
+                        <div class="p-5 flex flex-col flex-1 justify-between space-y-4">
+                            <h4 class="font-extrabold text-sm md:text-base text-white group-hover:text-orange-400 transition leading-snug">${p.name}</h4>
+                            <div class="flex justify-between items-center pt-2 border-t border-slate-800/80">
+                                <div>
+                                    <span class="text-[10px] text-slate-500 block uppercase font-bold">Precio</span>
+                                    <span class="font-black text-orange-500 text-lg">S/ ${Number(p.price).toFixed(2)}</span>
+                                </div>
+                                <button onclick="addToCart('${p.id}')" class="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white p-3 rounded-2xl text-xs font-extrabold shadow-lg shadow-orange-600/25 transition transform active:scale-95 flex items-center space-x-1.5">
+                                    <i class="fa-solid fa-plus text-xs"></i>
+                                    <span>Añadir</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderGallery() {
+            const galleryGrid = document.getElementById('gallery-grid');
+            galleryGrid.innerHTML = '';
+            if (gallery.length === 0) {
+                galleryGrid.innerHTML = '<div class="col-span-full py-8 text-center text-slate-500 text-xs">Pronto agregaremos fotos de nuestro local.</div>';
+                return;
+            }
+            gallery.forEach(item => {
+                galleryGrid.innerHTML += `
+                    <div class="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-xl group">
+                        <div class="relative overflow-hidden h-64">
+                            <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                        </div>
+                        <div class="p-4 text-center">
+                            <h4 class="font-bold text-sm text-white">${item.title}</h4>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function filterCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.className = "cat-btn px-5 py-2.5 rounded-2xl text-xs font-bold bg-slate-900 text-slate-400 hover:text-white border border-slate-800 shrink-0 transition flex items-center space-x-2";
+                if(btn.textContent.includes(cat) || (cat === 'todos' && btn.textContent.includes('Todos'))) {
+                    btn.className = "cat-btn active px-5 py-2.5 rounded-2xl text-xs font-bold bg-orange-600 text-white shadow-lg shadow-orange-600/30 shrink-0 transition flex items-center space-x-2";
+                }
+            });
+            renderProducts();
+        }
+
+        function filterMenu() { renderProducts(); }
+
+        function toggleCart() {
+            const drawer = document.getElementById('cart-drawer');
+            const box = document.getElementById('cart-content-box');
+            if (drawer.classList.contains('hidden')) {
+                drawer.classList.remove('hidden');
+                setTimeout(() => box.classList.remove('translate-x-full'), 10);
+            } else {
+                box.classList.add('translate-x-full');
+                setTimeout(() => drawer.classList.add('hidden'), 300);
+            }
+        }
+
+        function addToCart(id) {
+            const product = products.find(p => p.id === id);
+            const existing = cart.find(item => item.id === id);
+            if (existing) existing.qty++;
+            else cart.push({ ...product, qty: 1 });
+            updateCartUI();
+            toggleCart();
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cart-items');
+            const countBadge = document.getElementById('cart-count');
+            const countBadgeMob = document.getElementById('cart-count-mobile');
+            const totalEl = document.getElementById('cart-total');
+            const deliveryTypeVal = document.getElementById('delivery-type').value;
+            
+            container.innerHTML = '';
+            let subtotal = 0, totalCount = 0;
+
+            cart.forEach((item, index) => {
+                subtotal += item.price * item.qty;
+                totalCount += item.qty;
+                container.innerHTML += `
+                    <div class="py-3 flex justify-between items-center">
+                        <div>
+                            <h5 class="font-bold text-xs text-white">${item.name}</h5>
+                            <p class="text-xs text-orange-400 font-medium">S/ ${Number(item.price).toFixed(2)} x ${item.qty}</p>
+                        </div>
+                        <div class="flex items-center space-x-2 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
+                            <button onclick="changeQty(${index}, -1)" class="w-6 h-6 bg-slate-800 rounded-lg text-xs font-bold text-slate-300 hover:bg-slate-700 transition">-</button>
+                            <span class="text-xs font-black px-1 text-white">${item.qty}</span>
+                            <button onclick="changeQty(${index}, 1)" class="w-6 h-6 bg-slate-800 rounded-lg text-xs font-bold text-slate-300 hover:bg-slate-700 transition">+</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            let deliveryFee = 0;
+            if (deliveryTypeVal.includes('S/ 5.00')) deliveryFee = 5.00;
+            if (deliveryTypeVal.includes('S/ 8.00')) deliveryFee = 8.00;
+
+            let total = subtotal + deliveryFee;
+
+            if(cart.length === 0) container.innerHTML = '<div class="text-center py-16 text-slate-500"><i class="fa-solid fa-basket-shopping text-3xl mb-2 text-slate-600"></i><p class="text-xs">Tu carrito está vacío.</p></div>';
+            countBadge.textContent = totalCount;
+            if(countBadgeMob) countBadgeMob.textContent = totalCount;
+            totalEl.textContent = `S/ ${total.toFixed(2)} ${deliveryFee > 0 ? `(incluye S/ ${deliveryFee.toFixed(2)} envío)` : '(Recojo)'}`;
+        }
+
+        function changeQty(index, delta) {
+            cart[index].qty += delta;
+            if (cart[index].qty <= 0) cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        async function checkoutWhatsApp() {
+            const name = document.getElementById('client-name').value.trim();
+            const address = document.getElementById('client-address').value.trim();
+            const deliveryType = document.getElementById('delivery-type').value;
+            const notes = document.getElementById('client-notes').value.trim();
+
+            if (!name || !address) { alert('Por favor ingresa tu nombre y dirección de entrega.'); return; }
+            if (cart.length === 0) { alert('Tu carrito está vacío.'); return; }
+
+            let subtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+            let deliveryFee = deliveryType.includes('S/ 5.00') ? 5.00 : deliveryType.includes('S/ 8.00') ? 8.00 : 0;
+            let total = subtotal + deliveryFee;
+
+            try {
+                const { collection, addDoc } = window.firebaseFns;
+                await addDoc(collection(window.db, "pedidos"), {
+                    client: name, address: address, deliveryType: deliveryType, notes: notes || 'Ninguna', items: cart, subtotal: subtotal, deliveryFee: deliveryFee, total: total, status: 'Pendiente', createdAt: new Date().toISOString()
+                });
+            } catch (e) { console.error(e); }
+
+            let msg = `*¡Hola Pollería Jercy's! Nuevo Pedido:*%0A%0A`;
+            msg += `👤 *Cliente:* ${name}%0A`;
+            msg += `🚚 *Tipo:* ${deliveryType}%0A`;
+            msg += `📍 *Dirección:* ${address}%0A`;
+            if(notes) msg += `📝 *Indicaciones:* ${notes}%0A`;
+            msg += `%0A🛒 *Detalle de Productos:*%0A`;
+            cart.forEach(i => { msg += `- ${i.name} (x${i.qty}) - S/ ${(i.price * i.qty).toFixed(2)}%0A`; });
+            if(deliveryFee > 0) msg += `📦 *Costo de Envíos:* S/ ${deliveryFee.toFixed(2)}%0A`;
+            msg += `%0A💰 *Total a pagar:* S/ ${total.toFixed(2)}`;
+
+            window.open(`https://wa.me/51921932329?text=${msg}`, '_blank');
+            cart = [];
+            updateCartUI();
+            toggleCart();
+        }
+    </script>
+</body>
+</html>

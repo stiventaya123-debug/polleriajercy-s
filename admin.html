@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin | Pollería Jercy's</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>body { font-family: 'Poppins', sans-serif; }</style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-orange-500 selection:text-white">
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, doc, setDoc, deleteDoc, updateDoc, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAMAVmKSb8Tygvd3NycZMrBj86GN9h4-j4",
+            authDomain: "registro-personas-c5e48.firebaseapp.com",
+            projectId: "registro-personas-c5e48",
+            storageBucket: "registro-personas-c5e48.firebasestorage.app",
+            messagingSenderId: "129443873783",
+            appId: "1:129443873783:web:9d4575e9ea54ba208e24f2"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.db = db;
+        window.firebaseFns = { collection, addDoc, doc, setDoc, deleteDoc, updateDoc, onSnapshot, getDocs };
+    </script>
+
+    <!-- Header Admin -->
+    <header class="bg-slate-900 border-b border-slate-800 text-white sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3.5">
+                <div class="relative">
+                    <img id="admin-logo" src="https://images.unsplash.com/photo-1626500147576-4d37c89f5d16?w=400&q=80" alt="Logo" class="w-12 h-12 rounded-full border-2 border-orange-500 object-cover shadow-lg shadow-orange-500/30">
+                    <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-slate-900 rounded-full"></span>
+                </div>
+                <div>
+                    <h1 class="text-base font-black tracking-wider text-white">POLLERÍA JERCY'S</h1>
+                    <span class="text-[11px] text-orange-400 font-bold flex items-center"><i class="fa-solid fa-circle text-[8px] text-emerald-500 mr-1.5 animate-pulse"></i> Panel de Control Seguro</span>
+                </div>
+            </div>
+            <a href="index.html" target="_blank" class="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 shadow-lg shadow-orange-600/20">
+                <i class="fa-solid fa-external-link-alt text-[10px]"></i>
+                <span>Ver Tienda</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Contenido Admin -->
+    <main class="max-w-7xl mx-auto px-4 py-8 flex-1 w-full space-y-6">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl">
+            <div>
+                <h2 class="text-2xl font-black text-white flex items-center"><i class="fa-solid fa-gauge text-orange-500 mr-3"></i> Gestión de Operaciones</h2>
+                <p class="text-xs text-slate-400 mt-1">Supervisa pedidos, administra el menú, galería y opciones de entrega.</p>
+            </div>
+            <div class="flex flex-wrap gap-2 bg-slate-950 p-1.5 rounded-2xl border border-slate-800">
+                <button onclick="switchAdminTab('orders')" id="tab-btn-orders" class="px-4 py-2 rounded-xl text-xs font-bold bg-orange-600 text-white shadow transition"><i class="fa-solid fa-bell mr-1.5"></i> Pedidos</button>
+                <button onclick="switchAdminTab('products')" id="tab-btn-products" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition"><i class="fa-solid fa-utensils mr-1.5"></i> Menú</button>
+                <button onclick="switchAdminTab('gallery')" id="tab-btn-gallery" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition"><i class="fa-solid fa-camera mr-1.5"></i> Galería</button>
+                <button onclick="switchAdminTab('config')" id="tab-btn-config" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition"><i class="fa-solid fa-gear mr-1.5"></i> Marca & Ubicación</button>
+            </div>
+        </div>
+
+        <!-- Pestaña Pedidos con Detalles de Delivery -->
+        <div id="admin-orders-content" class="space-y-4">
+            <h3 class="text-lg font-bold text-white flex items-center"><i class="fa-solid fa-clipboard-list mr-2 text-orange-500"></i> Pedidos Entrantes en Tiempo Real</h3>
+            <div id="admin-orders-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </div>
+
+        <!-- Pestaña Productos -->
+        <div id="admin-products-content" class="hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl">
+                <h3 id="form-product-title" class="text-base font-bold text-white mb-4 flex items-center"><i class="fa-solid fa-plus-circle mr-2 text-orange-500"></i> Agregar Nuevo Plato o Bebida</h3>
+                <form id="product-form" onsubmit="saveProduct(event)" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <input type="hidden" id="edit-product-id">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Nombre</label>
+                        <input type="text" id="prod-name" required class="w-full p-3 rounded-xl border border-slate-800 text-sm bg-slate-950 text-white focus:outline-none focus:border-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Categoría</label>
+                        <select id="prod-cat" class="w-full p-3 rounded-xl border border-slate-800 text-sm bg-slate-950 text-white focus:outline-none focus:border-orange-500">
+                            <option value="Pollos">Pollos a la Brasa</option>
+                            <option value="Combos">Combos</option>
+                            <option value="Bebidas">Bebidas</option>
+                            <option value="Adicionales">Adicionales</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Precio (S/)</label>
+                        <input type="number" step="0.50" id="prod-price" required class="w-full p-3 rounded-xl border border-slate-800 text-sm bg-slate-950 text-white focus:outline-none focus:border-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">URL de Imagen</label>
+                        <input type="url" id="prod-img" required class="w-full p-3 rounded-xl border border-slate-800 text-sm bg-slate-950 text-white focus:outline-none focus:border-orange-500">
+                    </div>
+                    <div class="md:col-span-2 lg:col-span-4 flex justify-end pt-2">
+                        <button type="submit" class="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white px-6 py-2 rounded-xl text-xs font-extrabold shadow-lg shadow-orange-600/30 transition">Guardar Plato</button>
+                    </div>
+                </form>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-xl">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-950/80 border-b border-slate-800 text-xs font-bold text-slate-400">
+                            <th class="p-4">Imagen</th>
+                            <th class="p-4">Nombre</th>
+                            <th class="p-4">Categoría</th>
+                            <th class="p-4">Precio</th>
+                            <th class="p-4 text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-products-table" class="divide-y divide-slate-800/60 text-sm"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pestaña Galería -->
+        <div id="admin-gallery-content" class="hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl max-w-xl mx-auto">
+                <h3 class="text-base font-bold text-white mb-4 flex items-center"><i class="fa-solid fa-camera mr-2 text-orange-500"></i> Agregar Foto a la Galería</h3>
+                <form id="gallery-form" onsubmit="saveGalleryPhoto(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Título</label>
+                        <input type="text" id="gal-title" required class="w-full p-3 rounded-xl border border-slate-800 text-sm bg-slate-950 text-white focus:outline-none focus:border-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">URL de la Imagen</label>
+                        <input type="url" id="gal-img" required class="w-full p-3 rounded-xl border border-slate-800 text-sm bg-slate-950 text-white focus:outline-none focus:border-orange-500">
+                    </div>
+                    <div class="flex justify-end pt-2">
+                        <button type="submit" class="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white px-6 py-2.5 rounded-xl text-xs font-extrabold shadow-lg transition">Subir a la Galería</button>
+                    </div>
+                </form>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-xl">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-950/80 border-b border-slate-800 text-xs font-bold text-slate-400">
+                            <th class="p-4">Imagen</th>
+                            <th class="p-4">Título</th>
+                            <th class="p-4 text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-gallery-table" class="divide-y divide-slate-800/60 text-sm"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pestaña Configuración -->
+        <div id="admin-config-content" class="hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl max-w-2xl mx-auto">
+                <h3 class="text-base font-bold text-white mb-4 flex items-center"><i class="fa-solid fa-location-crosshairs mr-2 text-orange-500"></i> Configurar Ubicación y Marca</h3>
+                <form id="config-form" onsubmit="saveConfig(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">URL del Logo</label>
+                        <input type="url" id="config-logo" required class="w-full p-3 rounded-xl border border-slate-800 text-sm bg-slate-950 text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">URL de Portada</label>
+                        <input type="url" id="config-banner" required class="w-full p-3 rounded-xl border border-slate-800 text-sm bg-slate-950 text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Dirección Física</label>
+                        <input type="text" id="config-address" required class="w-full p-3 rounded-xl border border-slate-800 text-sm bg-slate-950 text-white">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-1.5">Horario</label>
+                            <input type="text" id="config-hours" required class="w-full p-3 rounded-xl border border-slate-800 text-sm bg-slate-950 text-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-1.5">Teléfono / WhatsApp</label>
+                            <input type="text" id="config-phone" required class="w-full p-3 rounded-xl border border-slate-800 text-sm bg-slate-950 text-white">
+                        </div>
+                    </div>
+                    <div class="flex justify-end pt-2">
+                        <button type="submit" class="bg-gradient-to-r from-orange-500 to-red-600 text-white px-6 py-2.5 rounded-xl text-xs font-extrabold shadow-lg transition">Guardar Configuración</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Script Admin -->
+    <script>
+        let products = [];
+        let gallery = [];
+        const defaultProducts = [
+            { name: "Pollo Entero a la Brasa", category: "Pollos", price: 65.00, image: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=500" },
+            { name: "Medio Pollo a la Brasa", category: "Pollos", price: 34.00, image: "https://images.unsplash.com/photo-1626500147576-4d37c89f5d16?w=500" },
+            { name: "Cuarto de Pollo", category: "Pollos", price: 18.00, image: "https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=500" },
+            { name: "Combo Familiar", category: "Combos", price: 75.00, image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500" },
+            { name: "Inca Kola 1.5 Litros", category: "Bebidas", price: 8.00, image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500" },
+            { name: "Porción de Papas Fritas", category: "Adicionales", price: 10.00, image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=500" }
+        ];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const check = setInterval(() => {
+                if (window.db && window.firebaseFns) {
+                    clearInterval(check);
+                    initAdmin();
+                }
+            }, 200);
+        });
+
+        async function initAdmin() {
+            const { collection, onSnapshot, addDoc, getDocs } = window.firebaseFns;
+            const db = window.db;
+
+            try {
+                const snapshotCheck = await getDocs(collection(db, "productos"));
+                if (snapshotCheck.empty) {
+                    for (let p of defaultProducts) await addDoc(collection(db, "productos"), p);
+                }
+            } catch (err) { console.error(err); }
+
+            onSnapshot(collection(db, "productos"), (snapshot) => {
+                products = [];
+                snapshot.forEach(docSnap => products.push({ id: docSnap.id, ...docSnap.data() }));
+                renderAdminProducts();
+            });
+
+            onSnapshot(collection(db, "galeria"), (snapshot) => {
+                gallery = [];
+                snapshot.forEach(docSnap => gallery.push({ id: docSnap.id, ...docSnap.data() }));
+                renderAdminGallery();
+            });
+
+            onSnapshot(collection(db, "configuracion"), (snapshot) => {
+                snapshot.forEach(docSnap => {
+                    if (docSnap.id === "marca") {
+                        const data = docSnap.data();
+                        if (data.logo) { document.getElementById('admin-logo').src = data.logo; document.getElementById('config-logo').value = data.logo; }
+                        if (data.banner) document.getElementById('config-banner').value = data.banner;
+                        if (data.address) document.getElementById('config-address').value = data.address;
+                        if (data.hours) document.getElementById('config-hours').value = data.hours;
+                        if (data.phone) document.getElementById('config-phone').value = data.phone;
+                    }
+                });
+            });
+
+            onSnapshot(collection(db, "pedidos"), (snapshot) => {
+                const list = document.getElementById('admin-orders-list');
+                list.innerHTML = '';
+                if (snapshot.empty) {
+                    list.innerHTML = '<div class="col-span-full py-12 text-center text-slate-500"><i class="fa-solid fa-inbox text-3xl mb-2"></i><p class="text-xs">No hay pedidos entrantes.</p></div>';
+                    return;
+                }
+                snapshot.forEach(docSnap => {
+                    const order = docSnap.data();
+                    const id = docSnap.id;
+                    list.innerHTML += `
+                        <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl space-y-3">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-bold text-sm text-white">${order.client}</h4>
+                                    <p class="text-xs text-orange-400 font-semibold mt-0.5"><i class="fa-solid fa-motorcycle mr-1"></i> ${order.deliveryType || 'Delivery'}</p>
+                                    <p class="text-xs text-slate-400 mt-0.5"><i class="fa-solid fa-location-dot mr-1 text-orange-500"></i> ${order.address}</p>
+                                    ${order.notes ? `<p class="text-[11px] text-amber-300 mt-1 bg-amber-500/10 p-2 rounded-xl border border-amber-500/20"><i class="fa-solid fa-note-sticky mr-1"></i> <b>Nota:</b> ${order.notes}</p>` : ''}
+                                </div>
+                                <span class="px-3 py-1 rounded-full text-[10px] font-black ${order.status === 'Pendiente' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'}">${order.status}</span>
+                            </div>
+                            <div class="text-xs text-slate-300 bg-slate-950 p-3 rounded-2xl border border-slate-800 space-y-1">
+                                ${order.items.map(i => `<div class="flex justify-between"><span>• ${i.name} (x${i.qty})</span><span class="font-bold">S/ ${(i.price * i.qty).toFixed(2)}</span></div>`).join('')}
+                                ${order.deliveryFee > 0 ? `<div class="flex justify-between text-orange-400 pt-1 border-t border-slate-800"><span>• Costo de Envío</span><span>S/ ${order.deliveryFee.toFixed(2)}</span></div>` : ''}
+                            </div>
+                            <div class="flex justify-between items-center pt-2">
+                                <span class="font-black text-xs text-orange-500">Total: S/ ${Number(order.total).toFixed(2)}</span>
+                                <div class="space-x-1">
+                                    <button onclick="updateOrderStatus('${id}', 'En preparación')" class="px-2.5 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/30 rounded-xl text-[10px] font-bold">Preparar</button>
+                                    <button onclick="updateOrderStatus('${id}', 'Entregado')" class="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-xl text-[10px] font-bold">Entregar</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        function switchAdminTab(tab) {
+            document.getElementById('admin-orders-content').classList.add('hidden');
+            document.getElementById('admin-products-content').classList.add('hidden');
+            document.getElementById('admin-gallery-content').classList.add('hidden');
+            document.getElementById('admin-config-content').classList.add('hidden');
+            
+            document.getElementById('tab-btn-orders').className = "px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition";
+            document.getElementById('tab-btn-products').className = "px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition";
+            document.getElementById('tab-btn-gallery').className = "px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition";
+            document.getElementById('tab-btn-config').className = "px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition";
+
+            if (tab === 'orders') { document.getElementById('admin-orders-content').classList.remove('hidden'); document.getElementById('tab-btn-orders').className = "px-4 py-2 rounded-xl text-xs font-bold bg-orange-600 text-white shadow transition"; }
+            else if (tab === 'products') { document.getElementById('admin-products-content').classList.remove('hidden'); document.getElementById('tab-btn-products').className = "px-4 py-2 rounded-xl text-xs font-bold bg-orange-600 text-white shadow transition"; }
+            else if (tab === 'gallery') { document.getElementById('admin-gallery-content').classList.remove('hidden'); document.getElementById('tab-btn-gallery').className = "px-4 py-2 rounded-xl text-xs font-bold bg-orange-600 text-white shadow transition"; }
+            else if (tab === 'config') { document.getElementById('admin-config-content').classList.remove('hidden'); document.getElementById('tab-btn-config').className = "px-4 py-2 rounded-xl text-xs font-bold bg-orange-600 text-white shadow transition"; }
+        }
+
+        function renderAdminProducts() {
+            const tbody = document.getElementById('admin-products-table');
+            tbody.innerHTML = '';
+            products.forEach(p => {
+                tbody.innerHTML += `
+                    <tr class="border-b border-slate-800/60 hover:bg-slate-950/40 transition">
+                        <td class="p-4"><img src="${p.image}" class="w-10 h-10 rounded-xl object-cover border border-slate-800"></td>
+                        <td class="p-4 font-bold text-white">${p.name}</td>
+                        <td class="p-4"><span class="bg-slate-950 border border-slate-800 px-2.5 py-1 rounded-full text-[10px] font-semibold text-orange-400">${p.category}</span></td>
+                        <td class="p-4 font-black text-orange-500">S/ ${Number(p.price).toFixed(2)}</td>
+                        <td class="p-4 text-center"><button onclick="deleteProduct('${p.id}')" class="text-red-400 hover:text-red-300 font-bold text-xs"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderAdminGallery() {
+            const tbody = document.getElementById('admin-gallery-table');
+            tbody.innerHTML = '';
+            gallery.forEach(item => {
+                tbody.innerHTML += `
+                    <tr class="border-b border-slate-800/60 hover:bg-slate-950/40 transition">
+                        <td class="p-4"><img src="${item.image}" class="w-12 h-12 rounded-xl object-cover border border-slate-800"></td>
+                        <td class="p-4 font-bold text-white">${item.title}</td>
+                        <td class="p-4 text-center"><button onclick="deleteGalleryPhoto('${item.id}')" class="text-red-400 hover:text-red-300 font-bold text-xs"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function saveProduct(e) {
+            e.preventDefault();
+            const name = document.getElementById('prod-name').value.trim();
+            const category = document.getElementById('prod-cat').value;
+            const price = parseFloat(document.getElementById('prod-price').value);
+            const image = document.getElementById('prod-img').value.trim();
+            await window.firebaseFns.addDoc(window.firebaseFns.collection(window.db, "productos"), { name, category, price, image });
+            alert('¡Plato agregado!');
+            document.getElementById('product-form').reset();
+        }
+
+        async function saveGalleryPhoto(e) {
+            e.preventDefault();
+            const title = document.getElementById('gal-title').value.trim();
+            const image = document.getElementById('gal-img').value.trim();
+            await window.firebaseFns.addDoc(window.firebaseFns.collection(window.db, "galeria"), { title, image });
+            alert('¡Foto subida!');
+            document.getElementById('gallery-form').reset();
+        }
+
+        async function deleteProduct(id) {
+            if(confirm('¿Eliminar?')) await window.firebaseFns.deleteDoc(window.firebaseFns.doc(window.db, "productos", id));
+        }
+
+        async function deleteGalleryPhoto(id) {
+            if(confirm('¿Eliminar foto?')) await window.firebaseFns.deleteDoc(window.firebaseFns.doc(window.db, "galeria", id));
+        }
+
+        async function updateOrderStatus(id, status) {
+            await window.firebaseFns.updateDoc(window.firebaseFns.doc(window.db, "pedidos", id), { status });
+        }
+
+        async function saveConfig(e) {
+            e.preventDefault();
+            const logo = document.getElementById('config-logo').value.trim();
+            const banner = document.getElementById('config-banner').value.trim();
+            const address = document.getElementById('config-address').value.trim();
+            const hours = document.getElementById('config-hours').value.trim();
+            const phone = document.getElementById('config-phone').value.trim();
+            await window.firebaseFns.setDoc(window.firebaseFns.doc(window.db, "configuracion", "marca"), { logo, banner, address, hours, phone });
+            alert('¡Configuración guardada!');
+        }
+    </script>
+</body>
+</html>
