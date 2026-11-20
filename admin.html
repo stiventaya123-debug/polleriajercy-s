@@ -60,17 +60,18 @@
         <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl">
             <div>
                 <h2 class="text-2xl font-black text-white flex items-center"><i class="fa-solid fa-gauge text-orange-500 mr-3"></i> Gestión de Operaciones</h2>
-                <p class="text-xs text-slate-400 mt-1">Supervisa pedidos, administra el menú, galería y opciones de entrega.</p>
+                <p class="text-xs text-slate-400 mt-1">Supervisa pedidos, administra el menú, la galería, la promoción y la configuración.</p>
             </div>
             <div class="flex flex-wrap gap-2 bg-slate-950 p-1.5 rounded-2xl border border-slate-800">
                 <button onclick="switchAdminTab('orders')" id="tab-btn-orders" class="px-4 py-2 rounded-xl text-xs font-bold bg-orange-600 text-white shadow transition"><i class="fa-solid fa-bell mr-1.5"></i> Pedidos</button>
                 <button onclick="switchAdminTab('products')" id="tab-btn-products" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition"><i class="fa-solid fa-utensils mr-1.5"></i> Menú</button>
                 <button onclick="switchAdminTab('gallery')" id="tab-btn-gallery" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition"><i class="fa-solid fa-camera mr-1.5"></i> Galería</button>
+                <button onclick="switchAdminTab('promo')" id="tab-btn-promo" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition"><i class="fa-solid fa-fire mr-1.5"></i> Promoción</button>
                 <button onclick="switchAdminTab('config')" id="tab-btn-config" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition"><i class="fa-solid fa-gear mr-1.5"></i> Marca & Ubicación</button>
             </div>
         </div>
 
-        <!-- Pestaña Pedidos con Detalles de Delivery -->
+        <!-- Pestaña Pedidos -->
         <div id="admin-orders-content" class="space-y-4">
             <h3 class="text-lg font-bold text-white flex items-center"><i class="fa-solid fa-clipboard-list mr-2 text-orange-500"></i> Pedidos Entrantes en Tiempo Real</h3>
             <div id="admin-orders-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
@@ -131,14 +132,14 @@
                 <form id="gallery-form" onsubmit="saveGalleryPhoto(event)" class="space-y-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-400 mb-1.5">Título</label>
-                        <input type="text" id="gal-title" required class="w-full p-3 rounded-xl border border-slate-800 text-sm bg-slate-950 text-white focus:outline-none focus:border-orange-500">
+                        <input type="text" id="gal-title" required class="w-full p-3 rounded-xl border border-slate-800 text-sm bg-slate-950 text-white">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-400 mb-1.5">URL de la Imagen</label>
-                        <input type="url" id="gal-img" required class="w-full p-3 rounded-xl border border-slate-800 text-sm bg-slate-950 text-white focus:outline-none focus:border-orange-500">
+                        <input type="url" id="gal-img" required class="w-full p-3 rounded-xl border border-slate-800 text-sm bg-slate-950 text-white">
                     </div>
                     <div class="flex justify-end pt-2">
-                        <button type="submit" class="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white px-6 py-2.5 rounded-xl text-xs font-extrabold shadow-lg transition">Subir a la Galería</button>
+                        <button type="submit" class="bg-gradient-to-r from-orange-500 to-red-600 text-white px-6 py-2.5 rounded-xl text-xs font-extrabold shadow-lg">Subir a la Galería</button>
                     </div>
                 </form>
             </div>
@@ -153,6 +154,36 @@
                     </thead>
                     <tbody id="admin-gallery-table" class="divide-y divide-slate-800/60 text-sm"></tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- Pestaña Promoción Destacada (NUEVO) -->
+        <div id="admin-promo-content" class="hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl max-w-2xl mx-auto">
+                <h3 class="text-base font-bold text-white mb-4 flex items-center"><i class="fa-solid fa-fire mr-2 text-orange-500"></i> Editar Banner de Promoción Principal</h3>
+                <form id="promo-form" onsubmit="savePromo(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Título de la Promoción</label>
+                        <input type="text" id="promo-title" placeholder="Ej. ¡Super Combo Familiar Jercy's!" required class="w-full p-3 rounded-xl border border-slate-800 text-sm bg-slate-950 text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Descripción del Combo</label>
+                        <input type="text" id="promo-desc" placeholder="Ej. 1 Pollo Entero + Papas + Ensalada + Inca Kola 1.5L" required class="w-full p-3 rounded-xl border border-slate-800 text-sm bg-slate-950 text-white">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-1.5">Precio de Oferta</label>
+                            <input type="text" id="promo-price" placeholder="Ej. S/ 79.90" required class="w-full p-3 rounded-xl border border-slate-800 text-sm bg-slate-950 text-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-1.5">URL de la Foto del Combo</label>
+                            <input type="url" id="promo-img" required class="w-full p-3 rounded-xl border border-slate-800 text-sm bg-slate-950 text-white">
+                        </div>
+                    </div>
+                    <div class="flex justify-end pt-2">
+                        <button type="submit" class="bg-gradient-to-r from-orange-500 to-red-600 text-white px-6 py-2.5 rounded-xl text-xs font-extrabold shadow-lg">Actualizar Promoción en la Página</button>
+                    </div>
+                </form>
             </div>
         </div>
 
@@ -184,7 +215,7 @@
                         </div>
                     </div>
                     <div class="flex justify-end pt-2">
-                        <button type="submit" class="bg-gradient-to-r from-orange-500 to-red-600 text-white px-6 py-2.5 rounded-xl text-xs font-extrabold shadow-lg transition">Guardar Configuración</button>
+                        <button type="submit" class="bg-gradient-to-r from-orange-500 to-red-600 text-white px-6 py-2.5 rounded-xl text-xs font-extrabold shadow-lg">Guardar Configuración</button>
                     </div>
                 </form>
             </div>
@@ -246,6 +277,13 @@
                         if (data.hours) document.getElementById('config-hours').value = data.hours;
                         if (data.phone) document.getElementById('config-phone').value = data.phone;
                     }
+                    if (docSnap.id === "promocion") {
+                        const promo = docSnap.data();
+                        if (promo.title) document.getElementById('promo-title').value = promo.title;
+                        if (promo.desc) document.getElementById('promo-desc').value = promo.desc;
+                        if (promo.price) document.getElementById('promo-price').value = promo.price;
+                        if (promo.image) document.getElementById('promo-img').value = promo.image;
+                    }
                 });
             });
 
@@ -265,6 +303,7 @@
                                 <div>
                                     <h4 class="font-bold text-sm text-white">${order.client}</h4>
                                     <p class="text-xs text-orange-400 font-semibold mt-0.5"><i class="fa-solid fa-motorcycle mr-1"></i> ${order.deliveryType || 'Delivery'}</p>
+                                    <p class="text-xs text-slate-300 mt-0.5"><i class="fa-solid fa-credit-card mr-1 text-emerald-400"></i> Pago: ${order.paymentMethod || 'Efectivo'}</p>
                                     <p class="text-xs text-slate-400 mt-0.5"><i class="fa-solid fa-location-dot mr-1 text-orange-500"></i> ${order.address}</p>
                                     ${order.notes ? `<p class="text-[11px] text-amber-300 mt-1 bg-amber-500/10 p-2 rounded-xl border border-amber-500/20"><i class="fa-solid fa-note-sticky mr-1"></i> <b>Nota:</b> ${order.notes}</p>` : ''}
                                 </div>
@@ -291,16 +330,19 @@
             document.getElementById('admin-orders-content').classList.add('hidden');
             document.getElementById('admin-products-content').classList.add('hidden');
             document.getElementById('admin-gallery-content').classList.add('hidden');
+            document.getElementById('admin-promo-content').classList.add('hidden');
             document.getElementById('admin-config-content').classList.add('hidden');
             
             document.getElementById('tab-btn-orders').className = "px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition";
             document.getElementById('tab-btn-products').className = "px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition";
             document.getElementById('tab-btn-gallery').className = "px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition";
+            document.getElementById('tab-btn-promo').className = "px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition";
             document.getElementById('tab-btn-config').className = "px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition";
 
             if (tab === 'orders') { document.getElementById('admin-orders-content').classList.remove('hidden'); document.getElementById('tab-btn-orders').className = "px-4 py-2 rounded-xl text-xs font-bold bg-orange-600 text-white shadow transition"; }
             else if (tab === 'products') { document.getElementById('admin-products-content').classList.remove('hidden'); document.getElementById('tab-btn-products').className = "px-4 py-2 rounded-xl text-xs font-bold bg-orange-600 text-white shadow transition"; }
             else if (tab === 'gallery') { document.getElementById('admin-gallery-content').classList.remove('hidden'); document.getElementById('tab-btn-gallery').className = "px-4 py-2 rounded-xl text-xs font-bold bg-orange-600 text-white shadow transition"; }
+            else if (tab === 'promo') { document.getElementById('admin-promo-content').classList.remove('hidden'); document.getElementById('tab-btn-promo').className = "px-4 py-2 rounded-xl text-xs font-bold bg-orange-600 text-white shadow transition"; }
             else if (tab === 'config') { document.getElementById('admin-config-content').classList.remove('hidden'); document.getElementById('tab-btn-config').className = "px-4 py-2 rounded-xl text-xs font-bold bg-orange-600 text-white shadow transition"; }
         }
 
@@ -352,6 +394,16 @@
             await window.firebaseFns.addDoc(window.firebaseFns.collection(window.db, "galeria"), { title, image });
             alert('¡Foto subida!');
             document.getElementById('gallery-form').reset();
+        }
+
+        async function savePromo(e) {
+            e.preventDefault();
+            const title = document.getElementById('promo-title').value.trim();
+            const desc = document.getElementById('promo-desc').value.trim();
+            const price = document.getElementById('promo-price').value.trim();
+            const image = document.getElementById('promo-img').value.trim();
+            await window.firebaseFns.setDoc(window.firebaseFns.doc(window.db, "configuracion", "promocion"), { title, desc, price, image });
+            alert('¡Promoción actualizada en la página principal con éxito!');
         }
 
         async function deleteProduct(id) {
